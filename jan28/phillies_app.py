@@ -3,7 +3,7 @@ import gradio as gr
 import pandas as pd  
 
 def fetch_phillies():
-    conn = sqlite3.connect('baseball.db')
+    conn = sqlite3.connect('../baseball.db')
     cursor = conn.cursor()
     query = """
         SELECT playerID
@@ -19,7 +19,7 @@ def fetch_phillies():
     return players
 
 def f(player):
-    conn = sqlite3.connect('baseball.db')
+    conn = sqlite3.connect('../baseball.db')
     cursor = conn.cursor()
     query = """
         SELECT HR
@@ -31,8 +31,11 @@ def f(player):
     conn.close()
     return records[0][0]
 
-print(f('schmimi01'))
-iface = gr.Interface(fn = f,inputs = gr.Dropdown(fetch_phillies(),value=None),outputs = "number",live = True)
+
+with gr.Blocks() as iface:
+    phillies_dd = gr.Dropdown(fetch_phillies(),interactive = True,value = None,label = "Select a Phillie")
+    HRbox = gr.Number(label = "Homerun Total")
+    phillies_dd.change(fn = f, inputs = [phillies_dd], outputs = [HRbox])
 
 iface.launch()
 
